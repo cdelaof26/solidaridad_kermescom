@@ -9,6 +9,8 @@ de poner en contacto a vendedores y compradores.
 
 #### Instalar requerimientos
 ```bash
+cd solidaridad_kermescom
+
 python3 -m pip install -r requirements.txt
 ```
 
@@ -24,6 +26,13 @@ export PHOTOS_DIR="/home/"
 #### Iniciar servidor de desarrollo
 ```bash
 flask --app main.py run
+```
+
+### Deploy to Azure
+```bash
+az login
+
+az webapp up --runtime PYTHON:3.13 --sku B1 --logs
 ```
 
 ### Endpoints
