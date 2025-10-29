@@ -27,22 +27,22 @@ def signup():
         return jsonify({"message": "Se requiere de un número de teléfono de 10 digitos"}), 400
 
     hashed_password = hash_text(password, True)
-    _p = pdir.joinpath(get_token())
-    _p.mkdir(parents=True)
-    _p = str(_p)
+    photo_dir = pdir.joinpath(get_token())
+    photo_dir.mkdir(parents=True)
+    photo_dir = str(photo_dir)
 
     with mysql.get_db().cursor() as cursor:
         query = ("INSERT INTO users "
                  "(email, password, name, paternal_surname, maternal_surname, phone_number, photo_dir)"
                  " values (%s, %s, %s, %s, %s, %s, %s)")
         try:
-            cursor.execute(query, (email, hashed_password, name, paternal, maternal, phone, _p))
+            cursor.execute(query, (email, hashed_password, name, paternal, maternal, phone, photo_dir))
         except pymysql.err.IntegrityError:
             return jsonify({"message": "El correo ya esta registrado"}), 401
 
     mysql.get_db().commit()
 
-    return jsonify({"message": "Signup successful"}), 200
+    return jsonify({"message": "Registro exitoso"}), 200
 
 
 @user_bp.route("/login", methods=["POST"])
@@ -70,7 +70,7 @@ def login():
         mysql.get_db().commit()
 
         return jsonify({
-            "message": "Login successful",
+            "message": "Sesión iniciada",
             "user_id": user[0],
             "token": t
         }), 200

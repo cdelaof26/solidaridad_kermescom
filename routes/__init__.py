@@ -1,14 +1,12 @@
+from .mysql_data import mysql, pdir
 from flaskext.mysql import MySQL
 from pathlib import Path
 from flask import Flask
-from .mysql_data import mysql, pdir
 import logging
 import os
 
 
 def create_app():
-    global mysql
-
     app = Flask(__name__)
 
     # MySQL configurations
@@ -31,8 +29,10 @@ def create_app():
 
     from .user import user_bp
     from .token import token_bp
+    from .products import products_bp
 
     app.register_blueprint(user_bp)
     app.register_blueprint(token_bp)
+    app.register_blueprint(products_bp)
 
     return app

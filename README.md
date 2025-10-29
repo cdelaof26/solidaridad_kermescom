@@ -34,9 +34,16 @@ flask --app main.py run
 nohup waitress-serve --call routes:create_app &
 ```
 
+#### Aprobar cuenta manualmente
+```mysql
+UPDATE users SET can_operate = true WHERE user_id = X;
+```
+
 
 ### Endpoints
 
+<details>
+    <summary>Usuario: /signup, /login</summary>
 <pre>
 /signup [POST]
 
@@ -50,9 +57,11 @@ Body: JSON
     "phone": 
 }
 
+Todos los campos son requeridos
+
 Response: JSON
 {
-    "message": "Signup successful"
+    "message": "Registro exitoso"
 }
 </pre>
 
@@ -63,19 +72,177 @@ Body: JSON
 {
     "email": "",
     "password": "",
-    "name": "",
-    "paternal": "",
-    "maternal": "",
-    "phone": [number]
 }
+
+Todos los campos son requeridos
 
 Response: JSON
 {
-    "message": "Login successful",
+    "message": "Sesión iniciada",
     "token": "23a3aea28f298dfe8e4d",
     "user_id": [number]
 }
 </pre>
+</details>
+
+
+
+<details>
+    <summary>Productos: /products, /my_products, /add_product, /edit_product, /delete_product</summary>
+
+
+<pre>
+/products [GET]
+
+Body: None
+
+Response: JSON
+[
+    {
+        "available": [number],
+        "description": "",
+        "name": "",
+        "photos": ["base64_photo_1", "base64_photo_2", ... ],
+        "price": [number],
+        "product_id": [number]
+    },
+    {
+        "available": [number],
+        "description": "",
+        "name": "",
+        "photos": ["base64_photo_1", "base64_photo_2", ... ],
+        "price": [number],
+        "product_id": [number]
+    }
+]
+</pre>
+
+
+<pre>
+/my_products [GET]
+
+Retorna los productos registrados por el usuario con sesión
+
+Body: None
+
+Error: JSON
+Si no hay una sesión activa
+{
+    "message": "La sesión ha expirado"
+}
+
+Si la cuenta no se ha aprobado, se responderá con 401
+{
+    "message": "La cuenta aún no ha sido aprobada"
+}
+
+Response: JSON
+Same as /products
+</pre>
+
+<pre>
+/add_product [POST]
+
+Body: JSON
+{
+    "name": "",
+    "description": "",
+    "price": [number],
+    "available": [number],
+    "photos": ["base64_image1", "base64_image2", ...]
+}
+
+Todos los campos son requeridos, excepto 'photos'
+
+Error: JSON
+Si no hay una sesión activa
+{
+    "message": "La sesión ha expirado"
+}
+
+Si la cuenta no se ha aprobado, se responderá con 401
+{
+    "message": "La cuenta aún no ha sido aprobada"
+}
+
+Response: JSON
+{
+    "message": "Producto agregado"
+}
+</pre>
+
+
+<pre>
+/edit_product [PUT]
+
+Body: JSON
+{
+    "product_id": "",
+    "name": "",
+    "description": "",
+    "price": [number],
+    "available": [number],
+    "photos": ["base64_image1", "base64_image2", ...]
+}
+
+Todos los campos son requeridos, excepto 'photos'
+
+Error: JSON
+Si no hay una sesión activa
+{
+    "message": "La sesión ha expirado"
+}
+
+Si la cuenta no se ha aprobado, se responderá con 401
+{
+    "message": "La cuenta aún no ha sido aprobada"
+}
+
+Si la cuenta no creo el producto, se responderá con 401
+{
+    "message": "El producto seleccionado (ID) no lo puede editar el usuario (ID)"
+}
+
+Response: JSON
+{
+    "message": "Producto editado"
+}
+</pre>
+
+
+<pre>
+/delete_product [DELETE]
+
+Body: JSON
+{
+    "product_id": "",
+}
+
+Error: JSON
+Si no hay una sesión activa
+{
+    "message": "La sesión ha expirado"
+}
+
+Si la cuenta no se ha aprobado, se responderá con 401
+{
+    "message": "La cuenta aún no ha sido aprobada"
+}
+
+Si la cuenta no creo el producto, se responderá con 401
+{
+    "message": "El producto seleccionado (ID) no lo puede editar el usuario (ID)"
+}
+
+Response: JSON
+{
+    "message": "Producto editado"
+}
+</pre>
+
+</details>
+
+
 
 <pre>
 /generate_token [GET]
