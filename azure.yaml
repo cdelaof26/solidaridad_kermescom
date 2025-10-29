@@ -1,6 +1,0 @@
-name: solidaridad-kermescom
-services:
-  web:
-    project: .
-    language: python
-    host: appservice

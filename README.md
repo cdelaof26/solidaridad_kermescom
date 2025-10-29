@@ -28,12 +28,8 @@ export PHOTOS_DIR="/home/"
 flask --app main.py run
 ```
 
-### Deploy to Azure
-```bash
-az login
+#### Deploy
 
-az webapp up --runtime PYTHON:3.13 --sku B1 --logs
-```
 
 ### Endpoints
 

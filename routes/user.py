@@ -26,7 +26,7 @@ def signup():
         return jsonify({"message": "Se requiere de un número de teléfono de 10 digitos"}), 400
 
     hashed_password = hash_text(password, True)
-    _p = pdir.config["PDIR"].joinpath(get_token())
+    _p = pdir.joinpath(get_token())
     _p.mkdir(parents=True)
     _p = str(_p)
 
