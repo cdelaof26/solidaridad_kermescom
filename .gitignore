@@ -1,0 +1,14 @@
+# Directories
+photos
+__pycache__
+.idea
+
+# OS
+*.DS_Store
+
+# Files
+*.mwb.bak
+_base.txt
+base_database.sql
+Design.key
+_db
