@@ -25,3 +25,56 @@ export PHOTOS_DIR="/home/"
 ```bash
 flask --app main.py run
 ```
+
+### Endpoints
+
+<pre>
+/signup [POST]
+
+Body: JSON
+{
+    "email": "",
+    "password": "",
+    "name": "",
+    "paternal": "",
+    "maternal": "",
+    "phone": 
+}
+
+Response: JSON
+{
+    "message": "Signup successful"
+}
+</pre>
+
+<pre>
+/login [POST]
+
+Body: JSON
+{
+    "email": "",
+    "password": "",
+    "name": "",
+    "paternal": "",
+    "maternal": "",
+    "phone": [number]
+}
+
+Response: JSON
+{
+    "message": "Login successful",
+    "token": "23a3aea28f298dfe8e4d",
+    "user_id": [number]
+}
+</pre>
+
+<pre>
+/generate_token [GET]
+
+Body: None
+
+Response: JSON
+{
+    "token": "7cb54234bd5490fbcec4"
+}
+</pre>
