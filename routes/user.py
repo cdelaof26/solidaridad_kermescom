@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from .token import hash_text, get_token
 from .mysql_data import mysql, pdir
+import pymysql
 import re
 
 user_bp = Blueprint("user", __name__)
@@ -34,7 +35,10 @@ def signup():
         query = ("INSERT INTO users "
                  "(email, password, name, paternal_surname, maternal_surname, phone_number, photo_dir)"
                  " values (%s, %s, %s, %s, %s, %s, %s)")
-        cursor.execute(query, (email, hashed_password, name, paternal, maternal, phone, _p))
+        try:
+            cursor.execute(query, (email, hashed_password, name, paternal, maternal, phone, _p))
+        except pymysql.err.IntegrityError:
+            return jsonify({"message": "El correo ya esta registrado"}), 401
 
     mysql.get_db().commit()
 

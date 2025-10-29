@@ -29,6 +29,10 @@ flask --app main.py run
 ```
 
 #### Deploy
+```bash
+# Ejecuta proyecto en segundo plano (puerto 8080)
+nohup waitress-serve --call routes:create_app &
+```
 
 
 ### Endpoints
