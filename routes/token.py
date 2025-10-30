@@ -1,5 +1,5 @@
-from .mysql_data import mysql, SESSION_TOKEN_HEADER
 from flask import Blueprint, request, jsonify
+from .mysql_data import mysql
 import secrets
 import hashlib
 
@@ -19,6 +19,9 @@ def get_token():
 
 
 def db_valid_token(user_id, session_token) -> bool:
+    if user_id is None or session_token is None:
+        return False
+
     with mysql.get_db().cursor() as cursor:
         query = "SELECT email FROM users WHERE user_id = %s AND session_token = %s AND session_expires > NOW();"
         cursor.execute(query, (user_id, session_token))
@@ -27,6 +30,28 @@ def db_valid_token(user_id, session_token) -> bool:
     if user:
         return True
     return False
+
+
+def register_token(session_token) -> int | None:
+    if session_token is None:
+        return None
+
+    with mysql.get_db().cursor() as cursor:
+        query = "SELECT * FROM guest_token WHERE token = %s;"
+        cursor.execute(query, (session_token, ))
+        token = cursor.fetchone()
+
+    if token:
+        return token[0]
+
+    with mysql.get_db().cursor() as cursor:
+        query = "INSERT INTO guest_token (token) VALUES (%s);"
+        cursor.execute(query, (session_token, ))
+        last_id = cursor.lastrowid
+
+    mysql.get_db().commit()
+
+    return last_id
 
 
 @token_bp.route("/validate_token", methods=["POST"])

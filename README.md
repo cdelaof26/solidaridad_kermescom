@@ -65,6 +65,32 @@ Response: JSON
 }
 </pre>
 
+
+<pre>
+/request_approval [POST]
+
+Body: JSON
+{
+    "photo": "base64_photo_1"
+}
+
+Error: JSON
+Si no hay una sesión activa
+{
+    "message": "La sesión ha expirado"
+}
+
+Si el campo "photo" no tiene datos base64 válidos, se responderá con 400
+{
+    "message": "Datos de imagen inválidos"
+}
+
+Response: JSON
+{
+    "message": "Archivo recibido"
+}
+</pre>
+
 <pre>
 /login [POST]
 
@@ -149,7 +175,7 @@ Body: JSON
     "description": "",
     "price": [number],
     "available": [number],
-    "photos": ["base64_image1", "base64_image2", ...]
+    "photos": ["base64_photo_1", "base64_photo_2", ...]
 }
 
 Todos los campos son requeridos, excepto 'photos'
@@ -182,7 +208,7 @@ Body: JSON
     "description": "",
     "price": [number],
     "available": [number],
-    "photos": ["base64_image1", "base64_image2", ...]
+    "photos": ["base64_photo_1", "base64_photo_2", ...]
 }
 
 Todos los campos son requeridos, excepto 'photos'
@@ -244,6 +270,82 @@ Response: JSON
 
 
 
+<details>
+    <summary>Tickets: /list_my_requests, /list_requests, /request_product, /generate_token</summary>
+
+<pre>
+/list_my_requests [GET]
+
+Body: None
+
+Error: JSON
+Si no hay un token único
+{
+    "message": "Se requiere de un token único"
+}
+
+Response: JSON
+[
+    {
+        "amount": [number],
+        "directions": "",
+        "feedback": [string or null],
+        "open": [0 or 1],
+        "phone_number": [number],
+        "product_id": [number],
+        "requester_name": "",
+        "ticket_id": [number],
+        "total": [number],
+        "user_id": [number]
+    }, ...
+]
+</pre>
+
+
+<pre>
+/list_requests [GET]
+
+Body: None
+
+Error: JSON
+Si no hay una sesión activa
+{
+    "message": "La sesión ha expirado"
+}
+
+Si la cuenta no se ha aprobado, se responderá con 401
+{
+    "message": "La cuenta aún no ha sido aprobada"
+}
+
+Response: JSON
+Same as /list_requests
+</pre>
+
+<pre>
+/request_product [GET]
+
+Body: JSON
+{
+    "product_id": "",
+    "amount": [number],
+    "requester_name": "",
+    "phone": [number],
+    "directions": ""
+}
+
+Error: JSON
+Si no hay un token único
+{
+    "message": "Se requiere de un token único"
+}
+
+Response: JSON
+{
+    "message": "Ticket abierto"
+}
+</pre>
+
 <pre>
 /generate_token [GET]
 
@@ -254,3 +356,5 @@ Response: JSON
     "token": "7cb54234bd5490fbcec4"
 }
 </pre>
+
+</details>

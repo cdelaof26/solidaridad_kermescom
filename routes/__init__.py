@@ -20,19 +20,25 @@ def create_app():
         exit(1)
 
     mysql_data.pdir = Path(p)
+    mysql_data.approval_pdir = mysql_data.pdir.joinpath("approval")
+
     if not mysql_data.pdir.exists():
         logging.warning(f"Directory {mysql_data.pdir} doesn't exist")
         mysql_data.pdir.mkdir(parents=True, exist_ok=True)
         logging.warning(f"Directory {mysql_data.pdir} was created")
+
+    mysql_data.approval_pdir.mkdir(parents=True, exist_ok=True)
 
     mysql_data.mysql = MySQL(app)
 
     from .user import user_bp
     from .token import token_bp
     from .products import products_bp
+    from .tickets import tickets_bp
 
     app.register_blueprint(user_bp)
     app.register_blueprint(token_bp)
     app.register_blueprint(products_bp)
+    app.register_blueprint(tickets_bp)
 
     return app

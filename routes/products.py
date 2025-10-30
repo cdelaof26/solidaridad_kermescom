@@ -11,7 +11,7 @@ def validate_product():
     user_id = request.headers.get(USER_ID_HEADER)
     session_token = request.headers.get(SESSION_TOKEN_HEADER)
     if not db_valid_token(user_id, session_token):
-        return jsonify({"message": "La sesión ha expirado"}), 400
+        return jsonify({"message": "La sesión ha expirado o los headers no se encontraron"}), 400
 
     if not db_can_account_operate(session_token):
         return jsonify({"message": "La cuenta aún no ha sido aprobada"}), 401
@@ -85,7 +85,7 @@ def list_user_products():
     user_id = request.headers.get(USER_ID_HEADER)
     session_token = request.headers.get(SESSION_TOKEN_HEADER)
     if not db_valid_token(user_id, session_token):
-        return jsonify({"message": "La sesión ha expirado"}), 400
+        return jsonify({"message": "La sesión ha expirado o los headers no se encontraron"}), 400
 
     with mysql.get_db().cursor() as cursor:
         query = "SELECT product_id, name, description, price, available, photo_dir FROM stock WHERE user_id = %s;"
@@ -181,7 +181,7 @@ def delete_product():
     user_id = request.headers.get(USER_ID_HEADER)
     session_token = request.headers.get(SESSION_TOKEN_HEADER)
     if not db_valid_token(user_id, session_token):
-        return jsonify({"message": "La sesión ha expirado"}), 400
+        return jsonify({"message": "La sesión ha expirado o los headers no se encontraron"}), 400
 
     if not db_can_account_operate(session_token):
         return jsonify({"message": "La cuenta aún no ha sido aprobada"}), 401
