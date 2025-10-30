@@ -1,5 +1,6 @@
 from .mysql_data import mysql, pdir
 from flaskext.mysql import MySQL
+from flask_cors import CORS
 from pathlib import Path
 from flask import Flask
 import logging
@@ -41,4 +42,6 @@ def create_app():
     app.register_blueprint(products_bp)
     app.register_blueprint(tickets_bp)
 
+    CORS(app)
+    
     return app
