@@ -1,5 +1,5 @@
+from .mysql_data import mysql, SESSION_TOKEN_HEADER, TOKEN_HEADER, USER_ID_HEADER
 from .token import register_token, db_valid_token, update_token
-from .mysql_data import mysql, SESSION_TOKEN_HEADER, USER_ID_HEADER
 from flask import Blueprint, request, jsonify
 import re
 
@@ -23,8 +23,8 @@ def tuple_to_ticket(t: tuple) -> dict:
 
 @tickets_bp.route("/list_my_requests", methods=["GET"])
 def list_my_tickets():
-    session_token = request.headers.get(SESSION_TOKEN_HEADER)
-    token_id = register_token(session_token)
+    token = request.headers.get(TOKEN_HEADER)
+    token_id = register_token(token)
     if token_id is None:
         return jsonify({"message": "Se requiere de un token único"}), 400
 
@@ -57,8 +57,8 @@ def list_tickets():
 
 @tickets_bp.route("/request_product", methods=["POST"])
 def request_product():
-    session_token = request.headers.get(SESSION_TOKEN_HEADER)
-    token_id = register_token(session_token)
+    token = request.headers.get(TOKEN_HEADER)
+    token_id = register_token(token)
     if token_id is None:
         return jsonify({"message": "Se requiere de un token único"}), 400
 
@@ -103,7 +103,7 @@ def request_product():
 
     mysql.get_db().commit()
 
-    if not update_token(session_token):
+    if not update_token(token):
         return jsonify({"message": "Internal error while refreshing token"}), 500
 
     return jsonify({"message": "Ticket abierto"}), 200

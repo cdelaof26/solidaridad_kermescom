@@ -42,6 +42,14 @@ UPDATE users SET can_operate = true WHERE user_id = X;
 
 ### Endpoints
 
+#### Headers
+`SESSION_TOKEN_HEADER = "Session-Token"`
+
+`TOKEN_HEADER = "SKE-Token"`
+
+`USER_ID_HEADER = "User-Id"`
+
+
 <details>
     <summary>Usuario: /signup, /login</summary>
 <pre>
