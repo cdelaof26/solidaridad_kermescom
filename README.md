@@ -7,10 +7,14 @@ de poner en contacto a vendedores y compradores.
 
 ### Desarrollo
 
+#### Requisitos
+- Python 3.10 o posterior
+
 #### Instalar requerimientos
 ```bash
 cd solidaridad_kermescom
 
+# Instalación en paquetes globales
 python3 -m pip install -r requirements.txt
 ```
 
@@ -39,16 +43,24 @@ nohup waitress-serve --call routes:create_app &
 UPDATE users SET can_operate = true WHERE user_id = X;
 ```
 
+#### Aprobar cuenta automáticamente sin validación
+```bash
+# Agrega la variable de entorno (valores "yes" o "no")
+# Se puede cambiar en runtime.
+export AUTO_APPROVE="yes"
+```
+
+
+### Headers
+
+| Nombre en backend      | Header          | Descripción                                                                                    |
+|------------------------|-----------------|------------------------------------------------------------------------------------------------|
+| `SESSION_TOKEN_HEADER` | `Session-Token` | Token generado por el sistema para inicio de sesión persistente y autenticación sin contraseña |
+| `USER_ID_HEADER`       | `User-Id`       | Identificador único del usuario registrado                                                     |
+| `TOKEN_HEADER`         | `SKE-Token`     | Token único generado por el sistema para el seguimiento de usuarios no registrados             |
+
 
 ### Endpoints
-
-#### Headers
-`SESSION_TOKEN_HEADER = "Session-Token"`
-
-`TOKEN_HEADER = "SKE-Token"`
-
-`USER_ID_HEADER = "User-Id"`
-
 
 <details>
     <summary>Usuario: /signup, /login</summary>
@@ -279,7 +291,7 @@ Response: JSON
 
 
 <details>
-    <summary>Tickets: /list_my_requests, /list_requests, /request_product, /generate_token</summary>
+    <summary>Tickets: /list_my_requests, /list_requests, /request_product, /add_feedback, /close_request, /close_my_request, /generate_token</summary>
 
 <pre>
 /list_my_requests [GET]
@@ -351,6 +363,72 @@ Si no hay un token único
 Response: JSON
 {
     "message": "Ticket abierto"
+}
+</pre>
+
+<pre>
+/add_feedback [POST]
+
+Body: JSON
+{
+    "ticket_id": [number],
+    "feedback": ""
+}
+
+Error: JSON
+Si no hay una sesión activa
+{
+    "message": "La sesión ha expirado"
+}
+
+Response: JSON
+{
+    "message": "Feedback agregado"
+}
+</pre>
+
+<pre>
+/close_request [POST]
+
+Body: JSON
+{
+    "ticket_id": [number]
+}
+
+Error: JSON
+Si no hay una sesión activa
+{
+    "message": "La sesión ha expirado"
+}
+
+Response: JSON
+{
+    "message": "Ticket cerrado"
+}
+</pre>
+
+<pre>
+/close_my_request [POST]
+
+Body: JSON
+{
+    "ticket_id": [number]
+}
+
+Error: JSON
+Si no hay un token único
+{
+    "message": "Se requiere de un token único"
+}
+
+Si el token único no coincide con el ticket_id
+{
+    "message": "W h a t"
+}
+
+Response: JSON
+{
+    "message": "Ticket cerrado"
 }
 </pre>
 

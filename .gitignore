@@ -7,8 +7,9 @@ __pycache__
 *.DS_Store
 
 # Files
+*.pyc
 *.mwb.bak
 _base.txt
 base_database.sql
 Design.key
-_db
+_db.txt

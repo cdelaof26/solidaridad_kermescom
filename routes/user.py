@@ -1,10 +1,11 @@
 from .mysql_data import mysql, approval_pdir, SESSION_TOKEN_HEADER, USER_ID_HEADER
-from .token import hash_text, get_token, db_valid_token
+from .token import hash_text, get_token, db_valid_token, update_token
 from flask import Blueprint, request, jsonify
 import binascii
 import pymysql
 import base64
 import re
+import os
 
 user_bp = Blueprint("user", __name__)
 
@@ -29,11 +30,18 @@ def signup():
         return jsonify({"message": "Se requiere de un número de teléfono de 10 digitos"}), 400
 
     hashed_password = hash_text(password, True)
+    auto_approve = os.getenv("AUTO_APPROVE") == "yes"
 
     with mysql.get_db().cursor() as cursor:
-        query = ("INSERT INTO users "
-                 "(email, password, name, paternal_surname, maternal_surname, phone_number)"
-                 " values (%s, %s, %s, %s, %s, %s)")
+        if auto_approve:
+            query = ("INSERT INTO users "
+                     "(email, password, name, paternal_surname, maternal_surname, phone_number, can_operate)"
+                     " values (%s, %s, %s, %s, %s, %s, 1)")
+        else:
+            query = ("INSERT INTO users "
+                     "(email, password, name, paternal_surname, maternal_surname, phone_number)"
+                     " values (%s, %s, %s, %s, %s, %s)")
+
         try:
             cursor.execute(query, (email, hashed_password, name, paternal, maternal, phone))
         except pymysql.err.IntegrityError:
@@ -41,6 +49,8 @@ def signup():
 
     mysql.get_db().commit()
 
+    if auto_approve:
+        return jsonify({"message": "Cuenta registrada y aprobada"}), 200
     return jsonify({"message": "Registro exitoso"}), 200
 
 
@@ -62,6 +72,9 @@ def request_approval():
             image.write(image_data)
     except binascii.Error:
         return jsonify({"message": "Datos de imagen inválidos"}), 400
+
+    if not update_token(session_token):
+        return jsonify({"message": "Internal error while refreshing token"}), 500
 
     return jsonify({"message": "Archivo recibido"}), 200
 

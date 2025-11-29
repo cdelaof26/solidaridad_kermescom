@@ -52,6 +52,9 @@ def list_tickets():
         cursor.execute(query, (user_id,))
         tickets = cursor.fetchall()
 
+    if not update_token(session_token):
+        return jsonify({"message": "Internal error while refreshing token"}), 500
+
     return [tuple_to_ticket(t) for t in tickets], 200
 
 
@@ -103,7 +106,93 @@ def request_product():
 
     mysql.get_db().commit()
 
-    if not update_token(token):
+    return jsonify({"message": "Ticket abierto"}), 200
+
+
+@tickets_bp.route("/add_feedback", methods=["POST"])
+def add_feedback():
+    user_id = request.headers.get(USER_ID_HEADER)
+    session_token = request.headers.get(SESSION_TOKEN_HEADER)
+    if not db_valid_token(user_id, session_token):
+        return jsonify({"message": "La sesión ha expirado o los headers no se encontraron"}), 400
+
+    data = request.get_json()
+    ticket_id = data["ticket_id"]
+    feedback = data["feedback"]
+
+    if not ticket_id:
+        return jsonify({"message": "Se requiere de un id de ticket"}), 400
+
+    if not feedback:
+        return jsonify({"message": "Se requiere del feedback"}), 400
+
+    with mysql.get_db().cursor() as cursor:
+        query = "UPDATE ticket SET feedback = %s WHERE ticket_id = %s;"
+        cursor.execute(query, (feedback, ticket_id))
+
+    mysql.get_db().commit()
+
+    if not update_token(session_token):
         return jsonify({"message": "Internal error while refreshing token"}), 500
 
-    return jsonify({"message": "Ticket abierto"}), 200
+    return jsonify({"message": "Feedback agregado"}), 200
+
+
+@tickets_bp.route("/close_request", methods=["POST"])
+def close_request():
+    user_id = request.headers.get(USER_ID_HEADER)
+    session_token = request.headers.get(SESSION_TOKEN_HEADER)
+    if not db_valid_token(user_id, session_token):
+        return jsonify({"message": "La sesión ha expirado o los headers no se encontraron"}), 400
+
+    data = request.get_json()
+    ticket_id = data["ticket_id"]
+
+    if not ticket_id:
+        return jsonify({"message": "Se requiere de un id de ticket"}), 400
+
+    with mysql.get_db().cursor() as cursor:
+        query = "SELECT user_id FROM ticket WHERE ticket_id = %s;"
+        cursor.execute(query, (ticket_id,))
+        ticket = cursor.fetchone()
+
+    if not ticket:
+        return jsonify({"message": "Ticket no encontrado"}), 500
+
+    if str(ticket[0]) != str(user_id):
+        return jsonify({
+            "message": f"El ticket seleccionado ({ticket_id}) no lo puede editar el usuario ({user_id})"
+        }), 401
+
+    with mysql.get_db().cursor() as cursor:
+        query = "UPDATE ticket SET open = false WHERE ticket_id = %s;"
+        cursor.execute(query, (ticket_id,))
+
+    mysql.get_db().commit()
+
+    if not update_token(session_token):
+        return jsonify({"message": "Internal error while refreshing token"}), 500
+
+    return jsonify({"message": "Ticket cerrado"}), 200
+
+
+@tickets_bp.route("/close_my_request", methods=["POST"])
+def close_my_request():
+    token = request.headers.get(TOKEN_HEADER)
+    token_id = register_token(token)
+    if token_id is None:
+        return jsonify({"message": "Se requiere de un token único"}), 400
+
+    data = request.get_json()
+    ticket_id = data["ticket_id"]
+
+    if not ticket_id:
+        return jsonify({"message": "Se requiere de un id de ticket"}), 400
+
+    with mysql.get_db().cursor() as cursor:
+        query = "UPDATE ticket SET open = false WHERE ticket_id = %s;"
+        cursor.execute(query, (ticket_id,))
+
+    mysql.get_db().commit()
+
+    return jsonify({"message": "Ticket cerrado"}), 200

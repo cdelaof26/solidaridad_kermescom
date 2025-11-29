@@ -92,6 +92,9 @@ def list_user_products():
         cursor.execute(query, (user_id, ))
         products = cursor.fetchall()
 
+    if not update_token(session_token):
+        return jsonify({"message": "Internal error while refreshing token"}), 500
+
     return processed_products(products)
 
 
@@ -145,7 +148,7 @@ def edit_product():
     if not product:
         return jsonify({"message": f"El producto {product_id} no existe"}), 404
 
-    if product[1] != user_id:
+    if str(product[1]) != str(user_id):
         return jsonify({
             "message": f"El producto seleccionado ({product_id}) no lo puede editar el usuario ({user_id})"
         }), 401
@@ -197,7 +200,7 @@ def delete_product():
     if not product:
         return jsonify({"message": f"El producto {product_id} no existe"}), 404
 
-    if product[1] != user_id:
+    if str(product[1]) != str(user_id):
         return jsonify({
             "message": f"El producto seleccionado ({product_id}) no lo puede editar el usuario ({user_id})"
         }), 401
