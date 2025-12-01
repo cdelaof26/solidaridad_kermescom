@@ -4,7 +4,6 @@ from flask import Blueprint, request, jsonify
 import binascii
 import pymysql
 import base64
-import re
 import os
 
 user_bp = Blueprint("user", __name__)
@@ -20,14 +19,14 @@ def signup():
     maternal = data.get("maternal")
     phone = data.get("phone")
 
-    if not email or not password:
+    if email is None or password is None:
         return jsonify({"message": "Correo y contraseña requeridos"}), 400
 
-    if not name or not paternal or not maternal:
+    if name is None or paternal is None or maternal is None:
         return jsonify({"message": "El nombre y apellidos son requeridos"}), 400
 
-    if not phone or re.sub(r"\d{10}", "", str(phone)) != "":
-        return jsonify({"message": "Se requiere de un número de teléfono de 10 digitos"}), 400
+    if phone is None or not isinstance(phone, int) or len(str(phone)) != 10:
+        return jsonify({"message": "Se requiere de un número de teléfono de 10 dígitos"}), 400
 
     hashed_password = hash_text(password, True)
     auto_approve = os.getenv("AUTO_APPROVE") == "yes"
@@ -63,7 +62,7 @@ def request_approval():
 
     data = request.get_json()
     photo = data.get("photo")
-    if not photo or not isinstance(photo, str):
+    if photo is None or not isinstance(photo, str):
         return jsonify({"message": "Se requiere del comprobante"}), 400
 
     try:
@@ -85,7 +84,7 @@ def login():
     email = data.get("email")
     password = data.get("password")
 
-    if not email or not password:
+    if email is None or password is None:
         return jsonify({"message": "Correo y contraseña requeridos"}), 400
 
     hashed_password = hash_text(password, True)

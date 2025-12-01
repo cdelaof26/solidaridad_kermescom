@@ -12,8 +12,18 @@ def create_app():
 
     # MySQL configurations
     app.config["MYSQL_DATABASE_HOST"] = os.getenv("MYSQL_HOST")
+    if app.config["MYSQL_DATABASE_HOST"] is None:
+        logging.error("A MySQL host must be specified (MYSQL_HOST environment variable)")
+        exit(1)
+
     app.config["MYSQL_DATABASE_USER"] = os.getenv("MYSQL_USER")
     app.config["MYSQL_DATABASE_PASSWORD"] = os.getenv("MYSQL_PASSWORD")
+
+    if app.config["MYSQL_DATABASE_USER"] is None or app.config["MYSQL_DATABASE_PASSWORD"] is None:
+        logging.error("A MySQL username and password must be specified "
+                      "(MYSQL_USER/MYSQL_PASSWORD environment variables)")
+        exit(1)
+
     app.config["MYSQL_DATABASE_DB"] = "sol_db"
     p = os.getenv("PHOTOS_DIR")
     if p is None:

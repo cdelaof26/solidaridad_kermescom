@@ -69,12 +69,12 @@ export AUTO_APPROVE="yes"
 
 Body: JSON
 {
-    "email": "",
-    "password": "",
-    "name": "",
-    "paternal": "",
-    "maternal": "",
-    "phone": 
+    "email": [string],
+    "password": [string],
+    "name": [string],
+    "paternal": [string],
+    "maternal": [string],
+    "phone": [number]
 }
 
 Todos los campos son requeridos
@@ -116,8 +116,8 @@ Response: JSON
 
 Body: JSON
 {
-    "email": "",
-    "password": "",
+    "email": [string],
+    "password": [string],
 }
 
 Todos los campos son requeridos
@@ -134,33 +134,73 @@ Response: JSON
 
 
 <details>
-    <summary>Productos: /products, /my_products, /add_product, /edit_product, /delete_product</summary>
+    <summary>Productos: /products, /product, /my_products, /add_product, /edit_product, /delete_product</summary>
 
 
 <pre>
-/products [GET]
+/products [POST]
 
-Body: None
+Body: [OPTIONAL] JSON
+{
+    "page_size": [number],
+    "page": [number]
+}
 
 Response: JSON
 [
     {
         "available": [number],
-        "description": "",
-        "name": "",
-        "photos": ["base64_photo_1", "base64_photo_2", ... ],
+        "description": [string],
+        "name": [string],
+        "photos": [number],
         "price": [number],
         "product_id": [number]
     },
     {
         "available": [number],
-        "description": "",
-        "name": "",
-        "photos": ["base64_photo_1", "base64_photo_2", ... ],
+        "description": [string],
+        "name": [string],
+        "photos": [number],
         "price": [number],
         "product_id": [number]
     }
 ]
+</pre>
+
+
+<pre>
+/product [POST]
+
+Body: JSON
+{
+    "product_id": [number]
+}
+
+Response: JSON
+{
+    "available": [number],
+    "description": [string],
+    "name": [string],
+    "photos": [number],
+    "price": [number],
+    "product_id": [number]
+}
+</pre>
+
+
+<pre>
+/product_photo [POST]
+
+Body: JSON
+{
+    "product_id": [number],
+    "photo": [number]
+}
+
+Response: JSON
+{
+    "photo": "base64data"
+}
 </pre>
 
 
@@ -191,8 +231,8 @@ Same as /products
 
 Body: JSON
 {
-    "name": "",
-    "description": "",
+    "name": [string],
+    "description": [string],
     "price": [number],
     "available": [number],
     "photos": ["base64_photo_1", "base64_photo_2", ...]
@@ -223,9 +263,9 @@ Response: JSON
 
 Body: JSON
 {
-    "product_id": "",
-    "name": "",
-    "description": "",
+    "product_id": [string],
+    "name": [string],
+    "description": [string],
     "price": [number],
     "available": [number],
     "photos": ["base64_photo_1", "base64_photo_2", ...]
@@ -261,7 +301,7 @@ Response: JSON
 
 Body: JSON
 {
-    "product_id": "",
+    "product_id": [string],
 }
 
 Error: JSON
@@ -308,12 +348,12 @@ Response: JSON
 [
     {
         "amount": [number],
-        "directions": "",
+        "directions": [string],
         "feedback": [string or null],
         "open": [0 or 1],
         "phone_number": [number],
         "product_id": [number],
-        "requester_name": "",
+        "requester_name": [string],
         "ticket_id": [number],
         "total": [number],
         "user_id": [number]
@@ -343,15 +383,15 @@ Same as /list_requests
 </pre>
 
 <pre>
-/request_product [GET]
+/request_product [POST]
 
 Body: JSON
 {
-    "product_id": "",
+    "product_id": [string],
     "amount": [number],
-    "requester_name": "",
+    "requester_name": [string],
     "phone": [number],
-    "directions": ""
+    "directions": [string]
 }
 
 Error: JSON
@@ -372,7 +412,7 @@ Response: JSON
 Body: JSON
 {
     "ticket_id": [number],
-    "feedback": ""
+    "feedback": [string]
 }
 
 Error: JSON

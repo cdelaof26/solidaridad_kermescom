@@ -1,7 +1,6 @@
 from .mysql_data import mysql, SESSION_TOKEN_HEADER, TOKEN_HEADER, USER_ID_HEADER
 from .token import register_token, db_valid_token, update_token
 from flask import Blueprint, request, jsonify
-import re
 
 tickets_bp = Blueprint("tickets", __name__)
 
@@ -74,15 +73,17 @@ def request_product():
     if directions is None:
         directions = ""
 
-    if not product_id:
-        return jsonify({"message": "Se requiere de un id de producto"}), 400
+    if not isinstance(product_id, int) or product_id < 0:
+        return jsonify({"message": "El id de producto es inválido"}), 400
 
-    if (not amount or re.sub(r"\d+", "", str(amount)) != ""
-            or not isinstance(amount, int) or amount < 0 or amount > 5):
+    if not isinstance(amount, int) or amount < 0 or amount > 5:
         return jsonify({"message": "Se requiere una cantidad númerica especifica mayor que cero y menor que 6"}), 400
 
-    if not requester_name or not phone:
+    if requester_name is None or phone is None:
         return jsonify({"message": "Se requiere nombre y número de un receptor"}), 400
+
+    if not isinstance(phone, int) or len(str(phone)) != 10:
+        return jsonify({"message": "Se requiere un número de teléfono de 10 dígitos"}), 400
 
     with mysql.get_db().cursor() as cursor:
         query = "SELECT user_id, price, available FROM stock WHERE product_id = %s AND available >= %s;"
@@ -120,7 +121,7 @@ def add_feedback():
     ticket_id = data["ticket_id"]
     feedback = data["feedback"]
 
-    if not ticket_id:
+    if not isinstance(ticket_id, int) or ticket_id < 0:
         return jsonify({"message": "Se requiere de un id de ticket"}), 400
 
     if not feedback:
@@ -148,7 +149,7 @@ def close_request():
     data = request.get_json()
     ticket_id = data["ticket_id"]
 
-    if not ticket_id:
+    if not isinstance(ticket_id, int) or ticket_id < 0:
         return jsonify({"message": "Se requiere de un id de ticket"}), 400
 
     with mysql.get_db().cursor() as cursor:
@@ -186,7 +187,7 @@ def close_my_request():
     data = request.get_json()
     ticket_id = data["ticket_id"]
 
-    if not ticket_id:
+    if not isinstance(ticket_id, int) or ticket_id < 0:
         return jsonify({"message": "Se requiere de un id de ticket"}), 400
 
     with mysql.get_db().cursor() as cursor:
