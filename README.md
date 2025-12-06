@@ -12,6 +12,9 @@ de poner en contacto a vendedores y compradores.
 
 #### Instalar requerimientos
 ```bash
+# Clona el proyecto
+git clone https://github.com/cdelaof26/solidaridad_kermescom.git
+
 cd solidaridad_kermescom
 
 # Instalación en paquetes globales
@@ -36,7 +39,55 @@ flask --app main.py run
 ```bash
 # Ejecuta proyecto en segundo plano (puerto 8080)
 nohup waitress-serve --call routes:create_app &
+# Waitress requiere instalación: python3 -m pip install waitress
 ```
+
+#### Unattended install in Debian systems
+El archivo `debian_install.sh` es un script escrito en
+bash y Python que tiene propósito realizar la instalación 
+del sistema completo en un ambiente Debian con mínima 
+interacción.
+
+```bash
+# Clona el proyecto
+git clone https://github.com/cdelaof26/solidaridad_kermescom.git
+
+cd solidaridad_kermescom
+
+# Realiza la instalación
+chmod +x debian_install.sh
+
+# ./debian_install [start] [stop]
+# [start]: operación sobre la cual iniciará (conforme a la siguiente tabla, columna "Argumento")
+# [stop]:  operación con la cual terminará
+# Ejemplos,
+#   ./debian_install.sh 2
+#      El script empezará en mysql_install y continuará hasta terminar con project_setup
+#   ./debian_install.sh 3 3
+#      El script solo ejecutará mysql_configure
+#   ./debian_install.sh 2 4
+#      El script ejecutará mysql_install, mysql_configure y database_setup
+
+export ROOT_PASSWORD=mySecurePassword
+export MYSQL_USER=myUser
+export MYSQL_PASSWORD=myPassword
+
+./debian_install.sh
+
+# El script require de tres variables de entorno,
+#  1. ROOT_PASSWORD: Es la contraseña que se le pondrá al usuario root de MySQL
+#  2. MYSQL_USER: Es el usuario que se configurará aparte de root
+#  3. MYSQL_PASSWORD: Es la contraseña del usuario que se configurará aparte de root
+```
+
+| Argumento | Nombre               | Descripción                                                                                                                         |
+|-----------|----------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| `1`       | `dependency_install` | Instala las dependencias necesarias para ejecutar el proyecto (`wget`, `gnupg`, `python3`, `python3-pip`, `python3-venv`)           |
+| `2`       | `mysql_install`      | Configura el repositorio para MySQL e instala `mysql-server`                                                                        |
+| `3`       | `mysql_configure`    | Realiza las configuraciones correspondientes a `mysql_secure_install`, estas se pueden modificar desde [secmysql.sql](secmysql.sql) |
+| `4`       | `database_setup`     | Crea la base de datos `sol_db` conforme a los contenidos de [database.sql](database.sql)                                            |
+| `5`       | `project_setup`      | Crea un ambiente Python (`venv`) e instala las dependencias conforme a los contenidos de [requirements.txt](requirements.txt)       |
+
 
 #### Aprobar cuenta manualmente
 ```mysql
