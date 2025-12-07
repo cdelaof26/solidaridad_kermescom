@@ -114,7 +114,7 @@ export AUTO_APPROVE="yes"
 ### Endpoints
 
 <details>
-    <summary>Usuario: /signup, /login</summary>
+    <summary>Usuario: /signup, /login, /logout</summary>
 <pre>
 /signup [POST]
 
@@ -133,6 +133,44 @@ Todos los campos son requeridos
 Response: JSON
 {
     "message": "Registro exitoso"
+}
+</pre>
+
+
+<pre>
+/login [POST]
+
+Body: JSON
+{
+    "email": [string],
+    "password": [string],
+}
+
+Todos los campos son requeridos
+
+Response: JSON
+{
+    "message": "Sesión iniciada",
+    "token": "23a3aea28f298dfe8e4d",
+    "user_id": [number]
+}
+</pre>
+
+
+<pre>
+/logout [POST]
+
+Body: None
+
+Error: JSON
+Si no hay una sesión activa
+{
+    "message": "La sesión ha expirado"
+}
+
+Response: JSON
+{
+    "message": "Sesión terminada"
 }
 </pre>
 
@@ -162,24 +200,6 @@ Response: JSON
 }
 </pre>
 
-<pre>
-/login [POST]
-
-Body: JSON
-{
-    "email": [string],
-    "password": [string],
-}
-
-Todos los campos son requeridos
-
-Response: JSON
-{
-    "message": "Sesión iniciada",
-    "token": "23a3aea28f298dfe8e4d",
-    "user_id": [number]
-}
-</pre>
 </details>
 
 
